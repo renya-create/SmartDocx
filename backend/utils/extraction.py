@@ -69,6 +69,28 @@ class WordFileHandler(FileSystemEventHandler):
                 else:
                     print(f"POSTリクエストが失敗しました。ステータスコード: {response.status_code}")
 
+    def on_modified(self, event):
+        global extracted_text
+        if event.src_path == self.file_path:
+            current_text = get_word_text(self.file_path)
+            if current_text and current_text != self.last_text:
+                if current_text.endswith("。") or current_text.endswith("."):
+                    print("\n[Wordファイルが変更されました] \n" + current_text)
+                    self.last_text = current_text
+                    # extracted_text = current_text  # グローバル変数に抽出された文章を格納
+                    # POSTリクエストを送信
+                    url = "https://teame-hebbh9hhgsdwgwgm.canadacentral-01.azurewebsites.net/generate-text"
+                    headers = {"Content-Type": "application/json"}
+                    data = {
+                        "input": current_text,
+                        "instruction": "inputの文章に続く1文として、最も可能性が高いものを出力してください。"
+                    }
+                    response = requests.post(url, headers=headers, json=data)
+                    if response.status_code == 200:
+                        print(response.text)
+                        AIanswer = response.text
+                    else:
+                        print(f"POSTリクエストが失敗しました。ステータスコード: {response.status_code}")
 
 if __name__ == "__main__":
     file_path = "/private/var/folders/rl/m7x_ycvx3yj7kwbyphz0sc680000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx" # ファイルパスを手動で入力
@@ -87,17 +109,3 @@ if __name__ == "__main__":
         observer.join()
     else:
         print("ファイルパスが入力されませんでした。")
-    # if file_path:
-    #     print(f"監視対象のWordファイル: {file_path}")
-    #     event_handler = WordFileHandler(file_path)
-    #     observer = Observer()
-    #     observer.schedule(event_handler, os.path.dirname(file_path), recursive=False)
-    #     observer.start()
-    #     try:
-    #         while True:
-    #             time.sleep(1)
-    #     except KeyboardInterrupt:
-    #         observer.stop()
-    #     observer.join()
-    # else:
-    #     print("ファイルが選択されませんでした。")
