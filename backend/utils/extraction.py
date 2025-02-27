@@ -1,6 +1,7 @@
 import time
 import platform
 import subprocess
+import requests
 import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -53,7 +54,21 @@ class WordFileHandler(FileSystemEventHandler):
             if current_text and current_text != self.last_text:
                 print("\n[Wordファイルが変更されました] \n" + current_text)
                 self.last_text = current_text
-                extracted_text = current_text  # グローバル変数に抽出された文章を格納
+                # extracted_text = current_text  # グローバル変数に抽出された文章を格納
+                # POSTリクエストを送信
+                url = "https://teame-hebbh9hhgsdwgwgm.canadacentral-01.azurewebsites.net/generate-text"
+                headers = {"Content-Type": "application/json"}
+                data = {
+                    "input": current_text,
+                    "instruction": "inputの文章に続く1文として、最も可能性が高いものを出力してください。"
+                }
+                response = requests.post(url, headers=headers, json=data)
+                if response.status_code == 200:
+                    print(response.text)
+                    AIanswer = response.text
+                else:
+                    print(f"POSTリクエストが失敗しました。ステータスコード: {response.status_code}")
+
 
 if __name__ == "__main__":
     file_path = "/private/var/folders/rl/m7x_ycvx3yj7kwbyphz0sc680000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx" # ファイルパスを手動で入力

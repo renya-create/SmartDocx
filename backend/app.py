@@ -1,7 +1,7 @@
 from flask import Flask, request, Response
 from utils.openai_helper import generate_text
 import os
-from extraction import extracted_text #extraction.pyから抽出された文章をインポート
+from utils.extraction import extracted_text #extraction.pyから抽出された文章をインポート
 
 app = Flask(__name__)
 
