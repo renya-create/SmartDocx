@@ -1,12 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, make_response
 from utils.openai_helper import generate_text
 import os
 import json
 
 app = Flask(__name__)
-
-# JSONのエンコード設定を変更
-app.config['JSON_AS_ASCII'] = False
 
 @app.route("/")
 def home():
@@ -22,25 +19,15 @@ def api_generate_text():
         # OpenAIを呼び出して文章生成
         generated_text = generate_text(input_text, instruction)
         
-        # 直接JSONをエンコードして返す
-        response_data = {"text": generated_text}
-        json_str = json.dumps(response_data, ensure_ascii=False)
-        response = Response(
-            response=json_str,
-            status=200,
-            mimetype="application/json"
-        )
+        # 日本語エンコードに対応したレスポンス
+        response = make_response(json.dumps({"text": generated_text}, ensure_ascii=False))
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
         return response
     
     except Exception as e:
-        error_data = {"error": str(e)}
-        json_str = json.dumps(error_data, ensure_ascii=False)
-        response = Response(
-            response=json_str,
-            status=500,
-            mimetype="application/json"
-        )
-        return response
+        response = make_response(json.dumps({"error": str(e)}, ensure_ascii=False))
+        response.headers['Content-Type'] = 'application/json; charset=utf-8'
+        return response, 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
