@@ -16,20 +16,20 @@ extracted_text = ""
 def get_word_text(file_path):
     """Wordファイルのテキストを取得"""
     try:
-        print(f"ファイルの存在確認: {os.path.exists(file_path)}")
+        #print(f"ファイルの存在確認: {os.path.exists(file_path)}")
         if IS_MAC:
             # Mac: textutilを使用
             txt_file_path = "/tmp/word_text.txt"  # 一時的なテキストファイルのパス
             
             # コマンドをデバッグ出力
             cmd = ["textutil", "-convert", "txt", file_path, "-output", txt_file_path]
-            print(f"実行するコマンド: {' '.join(cmd)}")
+            # print(f"実行するコマンド: {' '.join(cmd)}")
             
             # docxファイルをテキストファイルに変換
             result = subprocess.run(cmd, check=False, capture_output=True, text=True)
-            print(f"コマンド実行結果: 終了コード={result.returncode}")
-            print(f"標準出力: {result.stdout}")
-            print(f"標準エラー: {result.stderr}")
+            # print(f"コマンド実行結果: 終了コード={result.returncode}")
+            # print(f"標準出力: {result.stdout}")
+            # print(f"標準エラー: {result.stderr}")
             
             if result.returncode != 0:
                 print("textutilコマンドが失敗しました")
@@ -62,7 +62,7 @@ class WordFileHandler(FileSystemEventHandler):
         if not os.path.isfile(event.src_path):
             return
         
-        print(f"変更イベント検出: {event.src_path}")
+        # print(f"変更イベント検出: {event.src_path}")
         
         # ファイル名での比較
         event_filename = os.path.basename(event.src_path)
@@ -94,7 +94,7 @@ class WordFileHandler(FileSystemEventHandler):
                 try:
                     print("APIリクエスト送信中...")
                     response = requests.post(url, headers=headers, json=data)
-                    print(f"APIレスポンスステータス: {response.status_code}")
+                    #print(f"APIレスポンスステータス: {response.status_code}")
                     
                     if response.status_code == 200:
                         print(f"API応答: {response.text}")
@@ -114,18 +114,18 @@ if __name__ == "__main__":
         file_path = "/private" + file_path
     
     print(f"監視対象のWordファイル: {file_path}")
-    print(f"ファイルの存在確認: {os.path.exists(file_path)}")
+    # print(f"ファイルの存在確認: {os.path.exists(file_path)}")
     
     if os.path.exists(file_path):
         event_handler = WordFileHandler(file_path)
         observer = Observer()
         dir_path = os.path.dirname(file_path)
-        print(f"監視対象ディレクトリ: {dir_path}")
+        # print(f"監視対象ディレクトリ: {dir_path}")
         observer.schedule(event_handler, dir_path, recursive=False)
         observer.start()
         
-        print("ファイル監視を開始しました。文書を編集して保存してください。")
-        print("終了するには Ctrl+C を押してください。")
+        # print("ファイル監視を開始しました。文書を編集して保存してください。")
+        # print("終了するには Ctrl+C を押してください。")
         
         try:
             while True:
