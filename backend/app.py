@@ -1,6 +1,7 @@
 from flask import Flask, request, Response
 from utils.openai_helper import generate_text
 import os
+from utils.extraction import extracted_text #extraction.pyから抽出された文章をインポート
 
 app = Flask(__name__)
 
@@ -12,7 +13,7 @@ def home():
 def api_generate_text():
     try:
         data = request.get_json()
-        input_text = data.get("input", "")
+        input_text = extracted_text #ここでextraction.pyで抽出した文章をインプットしたい
         instruction = data.get("instruction", "inputの文章に続く1文として、最も可能性が高いものを出力してください。")
         
         # OpenAIを呼び出して文章生成
@@ -26,3 +27,5 @@ def api_generate_text():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
+
+
