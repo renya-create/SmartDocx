@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from utils.openai_helper import generate_text
 import os
+import json
 
 app = Flask(__name__)
 
@@ -21,10 +22,25 @@ def api_generate_text():
         # OpenAIを呼び出して文章生成
         generated_text = generate_text(input_text, instruction)
         
-        return jsonify({"text": generated_text})
+        # 直接JSONをエンコードして返す
+        response_data = {"text": generated_text}
+        json_str = json.dumps(response_data, ensure_ascii=False)
+        response = Response(
+            response=json_str,
+            status=200,
+            mimetype="application/json"
+        )
+        return response
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        error_data = {"error": str(e)}
+        json_str = json.dumps(error_data, ensure_ascii=False)
+        response = Response(
+            response=json_str,
+            status=500,
+            mimetype="application/json"
+        )
+        return response
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
