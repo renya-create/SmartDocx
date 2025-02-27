@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Word自動入力APIサーバーが稼働中です"
+    return "Word自動入力APIサーバーが稼働中!!!"
 
 @app.route("/generate-text", methods=["POST"])
 def api_generate_text():
@@ -18,6 +18,7 @@ def api_generate_text():
         
         # OpenAIを呼び出して文章生成
         generated_text = generate_text(input_text, instruction)
+        print(f"生成された文章: {generated_text}")
         
         # テキストだけを返す
         return Response(generated_text, mimetype="text/plain; charset=utf-8")
