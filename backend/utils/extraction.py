@@ -58,36 +58,32 @@ class WordFileHandler(FileSystemEventHandler):
         self.last_text = get_word_text(file_path) if os.path.exists(file_path) else ""
 
     def on_modified(self, event):
-        global extracted_text
-        print(f"変更イベント検出: {event.src_path}")  # デバッグ情報を追加
+        # 実際のファイルパスを含むイベントのみ処理
+        if not os.path.isfile(event.src_path):
+            return
         
-        # パスの正規化 - /privateプレフィックスの違いを吸収
-        normalized_event_path = os.path.normpath(event.src_path)
-        normalized_file_path = os.path.normpath(self.file_path)
+        print(f"変更イベント検出: {event.src_path}")
         
-        # ファイル名だけを比較する方法も追加
+        # ファイル名での比較
         event_filename = os.path.basename(event.src_path)
         watched_filename = os.path.basename(self.file_path)
         
-        print(f"イベントパス: {normalized_event_path}")
-        print(f"監視対象パス: {normalized_file_path}")
-        print(f"イベントファイル名: {event_filename}")
-        print(f"監視対象ファイル名: {watched_filename}")
-        
-        # ファイル名だけでも一致する場合は処理を続行
-        if normalized_event_path == normalized_file_path or event_filename == watched_filename:
+        if event_filename == watched_filename:
             print("\n[Wordファイルが変更されました]")
             
-            # ファイル変更の検出からテキスト取得までの間に少し待機
+            # 少し待機
             time.sleep(0.5)
             
-            current_text = get_word_text(event.src_path)  # 実際に変更があったパスを使用
-            print(f"取得されたテキスト: {current_text}")  # デバッグ情報を追加
+            # テキスト取得
+            current_text = get_word_text(event.src_path)
+            print(f"取得されたテキスト: {current_text}")
             
+            # テキストが有効で、かつ前回のテキストと異なる場合のみ処理
             if current_text and current_text != self.last_text:
-                print("\n[テキスト変更を検出] \n" + current_text)
+                print(f"\n[テキスト変更を検出] \n{current_text}")
                 self.last_text = current_text
-                # POSTリクエストを送信
+                
+                # APIリクエスト
                 url = "https://teame-hebbh9hhgsdwgwgm.canadacentral-01.azurewebsites.net/generate-text"
                 headers = {"Content-Type": "application/json"}
                 data = {
@@ -96,8 +92,9 @@ class WordFileHandler(FileSystemEventHandler):
                 }
                 
                 try:
+                    print("APIリクエスト送信中...")
                     response = requests.post(url, headers=headers, json=data)
-                    print(f"APIレスポンスステータス: {response.status_code}")  # デバッグ情報を追加
+                    print(f"APIレスポンスステータス: {response.status_code}")
                     
                     if response.status_code == 200:
                         print(f"API応答: {response.text}")
@@ -110,11 +107,11 @@ class WordFileHandler(FileSystemEventHandler):
 
 
 if __name__ == "__main__":
-    # 正しいパスを設定
     file_path = "/var/folders/ml/_h746s1j20lf_d2m5ql9z5_w0000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx"
     
-    # 絶対パスに変換
-    file_path = os.path.abspath(file_path)
+    # macOSでは /var と /private/var は同じ
+    if not os.path.exists(file_path) and os.path.exists("/private" + file_path):
+        file_path = "/private" + file_path
     
     print(f"監視対象のWordファイル: {file_path}")
     print(f"ファイルの存在確認: {os.path.exists(file_path)}")
@@ -122,11 +119,14 @@ if __name__ == "__main__":
     if os.path.exists(file_path):
         event_handler = WordFileHandler(file_path)
         observer = Observer()
-        # ディレクトリパスの取得時にも絶対パスを使う
         dir_path = os.path.dirname(file_path)
         print(f"監視対象ディレクトリ: {dir_path}")
         observer.schedule(event_handler, dir_path, recursive=False)
         observer.start()
+        
+        print("ファイル監視を開始しました。文書を編集して保存してください。")
+        print("終了するには Ctrl+C を押してください。")
+        
         try:
             while True:
                 time.sleep(1)
