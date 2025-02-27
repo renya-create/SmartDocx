@@ -5,6 +5,7 @@ import requests
 import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+#各種ライブラリをインポート
 
 # OS判定
 IS_MAC = platform.system() == "Darwin"
@@ -91,6 +92,7 @@ class WordFileHandler(FileSystemEventHandler):
                         AIanswer = response.text
                     else:
                         print(f"POSTリクエストが失敗しました。ステータスコード: {response.status_code}")
+
 
 if __name__ == "__main__":
     file_path = "/private/var/folders/rl/m7x_ycvx3yj7kwbyphz0sc680000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx" # ファイルパスを手動で入力
