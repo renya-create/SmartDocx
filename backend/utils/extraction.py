@@ -17,7 +17,7 @@ def get_word_text(file_path):
     try:
         if IS_MAC:
             # Mac: textutilを使用
-            txt_file_path = "/tmp/word_text.txt"  # 一時的なテキストファイルのパス
+            txt_file_path = "/Users/renyawada/Library/Containers/com.microsoft.Word/Data/file:/var/folders/ml/_h746s1j20lf_d2m5ql9z5_w0000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx"  # 一時的なテキストファイルのパス
 
             # docxファイルをテキストファイルに変換
             subprocess.run(["textutil", "-convert", "txt", file_path, "-output", txt_file_path], check=True)
@@ -30,14 +30,7 @@ def get_word_text(file_path):
             os.remove(txt_file_path)
 
             return text.strip()
-        else:
-            # Windows: win32comを使用
-            import win32com.client
-            word = win32com.client.Dispatch("Word.Application")
-            doc = word.Open(file_path)
-            text = doc.Content.Text
-            doc.Close()
-            return text
+
     except Exception as e:
         print(f"エラー: {e}")
         return None
@@ -71,7 +64,7 @@ class WordFileHandler(FileSystemEventHandler):
 
 
 if __name__ == "__main__":
-    file_path = "/private/var/folders/rl/m7x_ycvx3yj7kwbyphz0sc680000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx" # ファイルパスを手動で入力
+    file_path = "/Users/renyawada/Library/Containers/com.microsoft.Word/Data/file:/var/folders/ml/_h746s1j20lf_d2m5ql9z5_w0000gn/T/Word add-in 507457bb-29a9-4052-ae5b-4ce23e0bb4b8.docx" # ファイルパスを手動で入力
 
     if file_path:
         print(f"監視対象のWordファイル: {file_path}")
