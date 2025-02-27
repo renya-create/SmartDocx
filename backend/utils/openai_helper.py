@@ -5,11 +5,6 @@ from dotenv import load_dotenv
 # .env ファイルを読み込む
 load_dotenv()
 
-# print(os.getenv("API_KEY"))
-# print(os.getenv("API_VERSION"))
-# print(os.getenv("AZURE_OPENAI_ENDPOINT"))
-# print(os.getenv("MODEL_NAME"))  
-
 # AzureOpenAI クライアントを初期化
 client = AzureOpenAI(
     api_key=os.getenv("API_KEY"),  
