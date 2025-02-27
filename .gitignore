@@ -32,3 +32,45 @@ ENV/
 .vscode/
 *.swp
 *.swo
+
+# Node.js依存関係
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ビルド出力
+dist/
+build/
+out/
+
+# Python関連
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# 環境変数とシークレット
+.env
+.env.local
+.env.*
+
+# OS固有ファイル
+.DS_Store
+Thumbs.db
+*.tmp
+
+# IDEとエディタ
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Office開発固有
+*.cer
+*.pfx
+
+# デバッグログ
+debug.log
