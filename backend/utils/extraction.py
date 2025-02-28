@@ -58,6 +58,8 @@ class WordFileHandler(FileSystemEventHandler):
         self.last_text = get_word_text(file_path) if os.path.exists(file_path) else ""
 
     def on_modified(self, event):
+        global extracted_text
+
         # 実際のファイルパスを含むイベントのみ処理
         if not os.path.isfile(event.src_path):
             return
@@ -72,7 +74,7 @@ class WordFileHandler(FileSystemEventHandler):
             print("\n[Wordファイルが変更されました]")
             
             # 少し待機
-            time.sleep(0.5)
+            #time.sleep(0.5)
             
             # テキスト取得
             current_text = get_word_text(event.src_path)
@@ -82,9 +84,11 @@ class WordFileHandler(FileSystemEventHandler):
             if current_text and current_text != self.last_text:
                 print(f"\n[テキスト変更を検出] \n{current_text}")
                 self.last_text = current_text
+                extracted_text = current_text  # グローバル変数に抽出された文章を格納
+                print(f"抽出された文章: {extracted_text}")
                 
                 # APIリクエスト
-                url = "https://teame-hebbh9hhgsdwgwgm.canadacentral-01.azurewebsites.net/generate-text"
+                url = "https://smartdocx-dxcsgndhg2hfdpfn.canadacentral-01.azurewebsites.net/generate-text"
                 headers = {"Content-Type": "application/json"}
                 data = {
                     "input": current_text,
@@ -93,6 +97,7 @@ class WordFileHandler(FileSystemEventHandler):
                 
                 try:
                     print("APIリクエスト送信中...")
+                    print(data["input"])
                     response = requests.post(url, headers=headers, json=data)
                     #print(f"APIレスポンスステータス: {response.status_code}")
                     
